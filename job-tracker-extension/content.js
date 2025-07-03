@@ -1,5 +1,3 @@
-// content.js
-
 console.log("%c[JobTracker] 🎬 content.js injected", "color: purple; font-weight: bold;");
 
 window.addEventListener("load", () => {
@@ -37,7 +35,6 @@ window.addEventListener("load", () => {
       console.log("[JobTracker] fallback title →", jobTitle);
     }
 
-    // — Company
     const compEl = pick([
       "div.job-details-jobs-unified-top-card__company-name a",
       "div.job-details-jobs-unified-top-card__company-name",
@@ -63,19 +60,17 @@ window.addEventListener("load", () => {
       console.log("[JobTracker] fallback company →", company);
     }
 
-    // — Location
-    // LinkedIn puts location in the “tertiary description” section:
+
     const locEl = pick([
       "div.job-details-jobs-unified-top-card__tertiary-description-container span.tvm__text",
-      "span.jobs-unified-top-card__bullet",      // alternative bullet selector
-      ".jobs-unified-top-card__workplace-type"    // another variant
+      "span.jobs-unified-top-card__bullet",      
+      ".jobs-unified-top-card__workplace-type"    
     ]);
     let location = locEl?.innerText.trim() || "";
     console.log("[JobTracker] Detected location →", location);
 
     console.log(`[JobTracker] "${jobTitle}" @ "${company}" in "${location}"`);
 
-    // — send to backend
     try {
       const res = await fetch("http://localhost:5001/add-to-notion", {
         method: "POST",
