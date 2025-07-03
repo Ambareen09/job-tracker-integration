@@ -1,7 +1,5 @@
 # 📋 Job Application Tracker
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
 A Chrome extension + Flask backend that automatically logs your LinkedIn job applications into a Notion database. Capture **job title**, **company**, and **location** whenever you click **Apply**.
 
 ---
@@ -22,7 +20,6 @@ A Chrome extension + Flask backend that automatically logs your LinkedIn job app
 * [🔮 Future Scope](#-future-scope)
 * [🛠 Troubleshooting](#-troubleshooting)
 * [🎉 Contributing](#-contributing)
-* [⚖️ License](#-license)
 
 ---
 
@@ -177,7 +174,3 @@ Contributions are welcome! Please open issues or PRs to:
 * Support more job platforms
 
 ---
-
-## ⚖️ License
-
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
