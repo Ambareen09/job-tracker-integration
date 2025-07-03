@@ -1,3 +1,5 @@
+// content.js
+
 console.log("%c[JobTracker] 🎬 content.js injected", "color: purple; font-weight: bold;");
 
 window.addEventListener("load", () => {
@@ -14,16 +16,14 @@ window.addEventListener("load", () => {
   document.body.addEventListener("click", async (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
-
     const text = btn.innerText || "";
     const aria = btn.getAttribute("aria-label") || "";
-    if (!(/Apply/i).test(text) && !(/Apply/i).test(aria)) {
-      return;
-    }
-    console.log("[JobTracker] Apply button clicked");
+    if (!(/Apply/i).test(text) && !(/Apply/i).test(aria)) return;
+    console.log("[JobTracker] Apply clicked");
 
     await new Promise(r => setTimeout(r, 1500));
 
+    // — Job Title
     const titleEl = pick([
       "h1.jobs-unified-top-card__job-title",
       "h1.top-card-layout__title",
@@ -32,12 +32,12 @@ window.addEventListener("load", () => {
     ]);
     let jobTitle = titleEl?.innerText.trim() || "";
     if (!jobTitle) {
-      // fallback: parse document.title (“Title at Company | LinkedIn”)
       const parts = document.title.split("|")[0].split(" at ");
       jobTitle = parts[0].trim();
-      console.log("[JobTracker] fallback jobTitle →", jobTitle);
+      console.log("[JobTracker] fallback title →", jobTitle);
     }
 
+    // — Company
     const compEl = pick([
       "div.job-details-jobs-unified-top-card__company-name a",
       "div.job-details-jobs-unified-top-card__company-name",
@@ -45,11 +45,9 @@ window.addEventListener("load", () => {
       "a[data-test-company-name]",
       ".jobs-unified-top-card__company-name"
     ]);
-
     let company = "";
     if (compEl) {
       company = compEl.innerText.trim() || "";
-
       if (!company) {
         company =
           compEl.getAttribute("aria-label")?.replace(/\s*logo$/i, "").trim() ||
@@ -57,30 +55,35 @@ window.addEventListener("load", () => {
           "";
       }
     }
-
     if (!company) {
       const dt = document.title;
-      if (dt.includes(" at ")) {
-        company = dt.split(" at ")[1].split("|")[0].trim();
-      } else {
-        company = dt.split("|")[1]?.trim() || dt.split("|")[0].trim();
-      }
+      company = dt.includes(" at ")
+        ? dt.split(" at ")[1].split("|")[0].trim()
+        : (dt.split("|")[1] || dt.split("|")[0]).trim();
       console.log("[JobTracker] fallback company →", company);
     }
 
-    console.log(`[JobTracker] Detected: "${jobTitle}" at "${company}"`);
+    // — Location
+    // LinkedIn puts location in the “tertiary description” section:
+    const locEl = pick([
+      "div.job-details-jobs-unified-top-card__tertiary-description-container span.tvm__text",
+      "span.jobs-unified-top-card__bullet",      // alternative bullet selector
+      ".jobs-unified-top-card__workplace-type"    // another variant
+    ]);
+    let location = locEl?.innerText.trim() || "";
+    console.log("[JobTracker] Detected location →", location);
 
+    console.log(`[JobTracker] "${jobTitle}" @ "${company}" in "${location}"`);
+
+    // — send to backend
     try {
       const res = await fetch("http://localhost:5001/add-to-notion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobTitle, company })
+        body: JSON.stringify({ jobTitle, company, location })
       });
-      if (res.ok) {
-        console.log("[JobTracker] ✔ Logged to Notion");
-      } else {
-        console.error("[JobTracker] ✖ Notion API error:", await res.text());
-      }
+      if (res.ok) console.log("[JobTracker] ✔ Logged to Notion");
+      else       console.error("[JobTracker] ✖ Notion API error:", await res.text());
     } catch (err) {
       console.error("[JobTracker] ✖ Fetch failed", err);
     }

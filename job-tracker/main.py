@@ -39,8 +39,11 @@ def add_to_notion():
                 "date": {"start": datetime.utcnow().isoformat()}
             },
             "Source": {
-                "select": {"name": "LinkedIn"}
-            }
+            "select": { "name": "LinkedIn" }
+            },                             
+            "Location": {
+            "rich_text": [{ "text": { "content": data.get("location", "") }}]
+        }
         }
     }
 
