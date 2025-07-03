@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "LinkedIn Job Tracker",
+    "version": "1.2",
+    "permissions": ["scripting", "activeTab"],
+    "host_permissions": ["http://localhost:5001/*"],
+    "content_scripts": [
+      {
+        "matches": [
+          "*://*.linkedin.com/jobs/*",
+          "*://*.linkedin.com/*/jobs/*"
+        ],
+        "js": ["content.js"],
+        "run_at": "document_idle"
+      }
+    ]
+  }
