@@ -1,18 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Tracker Setup</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" />
+  <link rel="stylesheet" href="options.css" />
 </head>
 <body>
-  <h2>🔐 Setup Your Notion</h2>
-  <label>Notion API Token:</label><br />
-  <input type="text" id="notionKey" size="60"/><br><br>
+  <div class="container">
+    <h1>🔐 Job Tracker Setup</h1>
 
-  <label>Database ID:</label><br />
-  <input type="text" id="databaseId" size="60"/><br><br>
+    <label class="field-label" for="notionKey">
+      Notion Integration Token
+      <div class="tooltip">
+        <span class="tooltip-icon">?</span>
+        <div class="tooltip-text">
+          <strong>Step 1:</strong> Go to <code>notion.com/my-integrations</code><br>
+          <strong>Step 2:</strong> Create a new integration (e.g. "Job Tracker")<br>
+          <strong>Step 3:</strong> Copy the Internal Integration Token shown there.
+        </div>
+      </div>
+    </label>
+    <input type="password" id="notionKey" placeholder="secret_xxxxx..." />
 
-  <button id="saveBtn">Save</button>
-  <p id="status"></p>
+    <label class="field-label" for="databaseId">
+      Notion Database ID
+      <div class="tooltip">
+        <span class="tooltip-icon">?</span>
+        <div class="tooltip-text">
+          <strong>Step 1:</strong> Open your Notion Job Tracker database<br>
+          <strong>Step 2:</strong> Copy the long ID from the URL after <code>/yourname/</code><br>
+          e.g. <code>1234abcd5678efgh...</code>
+        </div>
+      </div>
+    </label>
+    <input type="text" id="databaseId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" />
+
+    <button id="saveBtn">💾 Save Settings</button>
+
+    <div id="success" class="success" style="display:none;">✅ Saved Successfully!</div>
+  </div>
 
   <script src="options.js"></script>
 </body>

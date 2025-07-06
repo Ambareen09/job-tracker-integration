@@ -1,15 +1,20 @@
 {
   "manifest_version": 3,
   "name": "LinkedIn Job Tracker",
-  "version": "2.0",
+  "version": "1.0",
+  "description": "Track your job applications directly to Notion from LinkedIn!",
+  "icons": {
+    "128": "icon.png"
+  },
   "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["https://job-tracker-integration.onrender.com/*"],
+  "host_permissions": [
+    "https://job-tracker-integration.onrender.com/*"
+  ],
   "content_scripts": [
     {
       "matches": ["*://*.linkedin.com/*"],
       "js": ["content.js"],
-      "run_at": "document_idle",
-      "all_frames": true
+      "run_at": "document_idle"
     }
   ],
   "options_page": "options.html",
