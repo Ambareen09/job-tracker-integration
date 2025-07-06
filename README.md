@@ -3,6 +3,8 @@
 A Chrome Extension + Flask backend that automatically logs your LinkedIn job applications into your Notion database.
 Capture **job title**, **company**, and **location** with one click — no manual copy-paste needed.
 
+Capture "Apply" event sent from LinkedIn, and stored the fields in Notion Template.
+
 ---
 
 ## 📌 Features
@@ -139,3 +141,10 @@ git checkout -b feature/your-feature
 Then push and open a **pull request**.
 
 ---
+## Future scope
+
+* Ensure user completed full application and submitted, before adding the field into notion database
+* Ensure user applies to the same job only once (If the job application link is external, linkedIn does not show the applied status)
+* Easy apply jobs must only be recorded if full application was submitted successfuly (and not in draft)
+
+
