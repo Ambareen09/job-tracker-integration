@@ -130,7 +130,7 @@ Want to help improve this project?
 ### Setup for Contributors:
 
 ```bash
-git clone https://github.com/yourusername/job-tracker-integration.git
+git clone https://github.com/Ambareen09/job-tracker-integration.git
 cd job-tracker-integration
 # Make changes in a new branch
 git checkout -b feature/your-feature
