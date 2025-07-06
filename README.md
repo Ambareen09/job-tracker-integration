@@ -1,176 +1,141 @@
-# 📋 Job Application Tracker
+# 🗭 LinkedIn Job Tracker
 
-A Chrome extension + Flask backend that automatically logs your LinkedIn job applications into a Notion database. Capture **job title**, **company**, and **location** whenever you click **Apply**.
-
----
-
-## 📑 Table of Contents
-
-* [🚀 Features](#-features)
-* [📦 Repo Structure](#-repo-structure)
-* [🎯 Prerequisites](#-prerequisites)
-* [🔨 Setup Guide](#-setup-guide)
-
-  * [Clone the Repo](#1-clone-the-repo)
-  * [Notion Configuration](#2-notion-configuration)
-  * [Backend (Flask) Setup](#3-backend-flask-setup)
-  * [Chrome Extension Installation](#4-chrome-extension-installation)
-  * [End-to-End Test](#5-end-to-end-test)
-* [☁️ Deployment (Optional)](#-deployment-optional)
-* [🔮 Future Scope](#-future-scope)
-* [🛠 Troubleshooting](#-troubleshooting)
-* [🎉 Contributing](#-contributing)
+A Chrome Extension + Flask backend that automatically logs your LinkedIn job applications into your Notion database.
+Capture **job title**, **company**, and **location** with one click — no manual copy-paste needed.
 
 ---
 
-## 🚀 Features
+## 📌 Features
 
-* **Automatic tracking**: Detects clicks on **Apply**/Easy Apply
-* **Notion integration**: Persists data via Notion API
-* **Fields captured**: Job Title, Company, Location, Date Applied, Source
-* **Duplicate prevention**: *(Future)* check before inserting
+* 👡 One-click job tracking from LinkedIn
+* 🧠 Stores all data in your personal Notion database
+* 🌐 Serverless Flask backend (can be deployed on Render)
+* 🔐 100% private — your Notion API credentials stay in your browser only
 
 ---
 
-## 📦 Repo Structure
+## 🚀 How to Use (For End Users)
+
+> Want to use the extension without coding? Just follow the steps below:
+
+### 1️⃣ Install the Chrome Extension
+
+1. Clone this repository:
+
+   ```bash
+   git clone https://github.com/Ambareen09/job-tracker-integration.git
+   ```
+
+2. Go to:
+
+   ```
+   chrome://extensions/
+   ```
+
+3. Enable **Developer mode** (top right)
+
+4. Click **"Load unpacked"**
+
+5. Select the `job-tracker-extension/` folder from the repo you cloned
+
+---
+
+### 2️⃣ Setup Notion Integration
+
+1. **Duplicate This Notion Template**
+   → [📄 Notion Template Link](https://warm-bow-beb.notion.site/Job-Tracker-Integration-with-LinkedIn-template-22824df94f24800d9e60d488eaf6fbc4)
+
+2. Go to: [notion.com/my-integrations](https://www.notion.com/my-integrations)
+
+   * Click **"New Integration"**
+   * Name it `Job Tracker`
+   * Copy the **Internal Integration Token**
+
+3. Share your database with the new integration (using “Share” → add integration)
+
+---
+
+### 3️⃣ Configure the Extension
+
+1. Click the **Job Tracker** extension icon in Chrome
+
+2. In the popup, click **Options**
+
+3. Paste:
+
+   * ✅ Your **Notion Integration Token**
+   * 📂 Your **Notion Database ID** (from the URL of the duplicated template)
+
+4. Click **Save** — you're done!
+
+---
+
+## 💠 Developer Guide
+
+### Backend Setup (Optional – Only for developers)
+
+This extension uses a Flask API to relay data to Notion.
+
+1. Navigate to `job-tracker/`:
+
+   ```bash
+   cd job-tracker
+   ```
+
+2. Create a `.env` file with the following content:
+
+   ```
+   NOTION_TOKEN=your_integration_token
+   NOTION_DATABASE_ID=your_database_id
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Run the backend locally:
+
+   ```bash
+   python main.py
+   ```
+
+Or deploy on [Render](https://render.com/) by pointing the root directory to `job-tracker/`.
+
+---
+
+## 🔒 Privacy & Data Usage
+
+* No personally identifiable data is stored.
+* All tokens and DB IDs are kept in Chrome local storage.
+* The extension sends data only to your own Notion workspace.
+* No external analytics or tracking scripts.
+
+📄 [View full Privacy Policy](https://www.notion.so/Privacy-Policy-for-LinkedIn-Job-Tracker-Chrome-Extension-22824df94f2480d6b791d2ce664dec47)
+
+---
+
+## 🤝 Contributing
+
+Want to help improve this project?
+
+### Ways to contribute:
+
+* 💡 Suggest improvements to UI/UX
+* 🌍 Add support for more job boards
+* 🧪 Add validation or duplicate check features
+* 🐞 Report issues or bugs
+
+### Setup for Contributors:
 
 ```bash
-linkedin-job-tracker/
-├── backend/
-│   ├── main.py           # Flask API server
-│   ├── requirements.txt  # Python dependencies
-│   └── .env.example      # Environment variables sample
-├── extension/
-│   ├── manifest.json     # Chrome extension manifest
-│   └── content.js        # Content script
-└── README.md             # This document
+git clone https://github.com/yourusername/job-tracker-integration.git
+cd job-tracker-integration
+# Make changes in a new branch
+git checkout -b feature/your-feature
 ```
 
----
-
-## 🎯 Prerequisites
-
-* Git
-* Python 3.7+ & pip
-* Google Chrome
-* Notion account with integration access
-
----
-
-## 🔨 Setup Guide
-
-### 1. Clone the Repo
-
-```bash
-git clone https://github.com/<your-username>/linkedin-job-tracker.git
-cd linkedin-job-tracker
-```
-
-### 2. Notion Configuration
-
-1. In Notion, navigate to **Settings & Members > Integrations**.
-2. Click **+ New integration**:
-
-   * **Name**: Job Tracker
-   * **Capabilities**: Read content, Insert content
-3. Copy the **Internal Integration Token**.
-4. Create a **Database** named **Job Tracker** with columns:
-
-   * **Company Name** (Title)
-   * **Job Title** (Rich Text)
-   * **Location** (Rich Text)
-   * **Date Applied** (Date)
-   * **Source** (Select: LinkedIn, etc.)
-5. Share the database with your integration.
-6. Copy the **Database ID** from the URL (after the last `/`).
-
-### 3. Backend (Flask) Setup
-
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your NOTION_API_KEY and NOTION_DATABASE_ID
-python main.py
-```
-
-The server runs at **[http://localhost:5001](http://localhost:5001)** by default.
-
-### 4. Chrome Extension Installation
-
-1. Open Chrome → `chrome://extensions`.
-2. Enable **Developer mode**.
-3. Click **Load unpacked** and select the `extension/` folder.
-4. Ensure the extension is **enabled**.
-
-### 5. End-to-End Test
-
-1. Open LinkedIn job page or search results.
-2. Open **DevTools** (F12) → **Console**.
-3. Click **Apply** or **Easy Apply** on any job.
-4. Verify logs:
-
-```
-[JobTracker] Apply button clicked
-[JobTracker] Detected: "Software Engineer" at "Acme Corp" in "Berlin, Germany"
-[JobTracker] ✔ Logged to Notion
-```
-
-5. Check your Notion DB for the new entry.
-
----
-
-## ☁️ Deployment (Optional)
-
-Deploy the Flask app to a hosting platform (Render, Railway, Heroku):
-
-1. Push your repo to GitHub.
-2. Connect the project to your hosting service.
-3. Set **NOTION\_API\_KEY** and **NOTION\_DATABASE\_ID** in env vars.
-4. Update `fetch` URL in `extension/content.js` to your deployed endpoint.
-
----
-
-## 🔮 Future Scope
-
-* ✅ **Duplicate checks**: Query existing rows before inserting
-* 🌐 Support other job sites (Indeed, Glassdoor)
-* 🔔 Chrome UI notifications for success/failure and duplicates
-* 📊 Analytics dashboard for application history
-
----
-
-## 🛠 Troubleshooting
-
-* **No console logs**: Verify `manifest.json` has:
-
-  ```json
-  "matches": ["*://*.linkedin.com/*"],
-  "run_at": "document_idle",
-  "all_frames": true
-  ```
-
-* **CORS errors**: Install and configure `flask-cors` in `main.py`:
-
-  ```python
-  from flask_cors import CORS
-  CORS(app, origins=["http://localhost:5001", "chrome-extension://<EXT_ID>"])
-  ```
-
-* **Selectors broken**: Inspect the LinkedIn DOM and update CSS selectors in `content.js`.
-
-* **Integration errors**: Ensure your `.env` values are correct and the integration has database access.
-
----
-
-## 🎉 Contributing
-
-Contributions are welcome! Please open issues or PRs to:
-
-* Add new features
-* Improve selectors or stability
-* Support more job platforms
+Then push and open a **pull request**.
 
 ---
