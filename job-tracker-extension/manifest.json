@@ -3,7 +3,7 @@
   "name": "LinkedIn Job Tracker",
   "version": "2.0",
   "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["https://your-api-url.com/*"],
+  "host_permissions": ["https://job-tracker-integration.onrender.com/*"],
   "content_scripts": [
     {
       "matches": ["*://*.linkedin.com/*"],
