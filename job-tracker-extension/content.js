@@ -14,14 +14,16 @@ window.addEventListener("load", () => {
   document.body.addEventListener("click", async (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
+
     const text = btn.innerText || "";
     const aria = btn.getAttribute("aria-label") || "";
     if (!(/Apply/i).test(text) && !(/Apply/i).test(aria)) return;
-    console.log("[JobTracker] Apply clicked");
+
+    console.log("[JobTracker] Apply button clicked");
 
     await new Promise(r => setTimeout(r, 1500));
 
-    // — Job Title
+    // --- Title ---
     const titleEl = pick([
       "h1.jobs-unified-top-card__job-title",
       "h1.top-card-layout__title",
@@ -35,6 +37,7 @@ window.addEventListener("load", () => {
       console.log("[JobTracker] fallback title →", jobTitle);
     }
 
+    // --- Company ---
     const compEl = pick([
       "div.job-details-jobs-unified-top-card__company-name a",
       "div.job-details-jobs-unified-top-card__company-name",
@@ -60,27 +63,40 @@ window.addEventListener("load", () => {
       console.log("[JobTracker] fallback company →", company);
     }
 
-
+    // --- Location ---
     const locEl = pick([
       "div.job-details-jobs-unified-top-card__tertiary-description-container span.tvm__text",
-      "span.jobs-unified-top-card__bullet",      
-      ".jobs-unified-top-card__workplace-type"    
+      "span.jobs-unified-top-card__bullet",
+      ".jobs-unified-top-card__workplace-type"
     ]);
     let location = locEl?.innerText.trim() || "";
     console.log("[JobTracker] Detected location →", location);
 
     console.log(`[JobTracker] "${jobTitle}" @ "${company}" in "${location}"`);
 
-    try {
-      const res = await fetch("http://localhost:5001/add-to-notion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobTitle, company, location })
-      });
-      if (res.ok) console.log("[JobTracker] ✔ Logged to Notion");
-      else       console.error("[JobTracker] ✖ Notion API error:", await res.text());
-    } catch (err) {
-      console.error("[JobTracker] ✖ Fetch failed", err);
-    }
+    // --- Get user credentials and send to backend ---
+    chrome.storage.sync.get(["notionKey", "databaseId"], async ({ notionKey, databaseId }) => {
+      if (!notionKey || !databaseId) {
+        console.warn("[JobTracker] ❌ Missing Notion credentials. Please set them in extension settings.");
+        return;
+      }
+
+      try {
+        const res = await fetch("https://job-tracker-integration.onrender.com/add-to-notion", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobTitle, company, location, notionKey, databaseId })
+        });
+
+        if (res.ok) {
+          console.log("[JobTracker] ✔ Logged to Notion");
+        } else {
+          const err = await res.text();
+          console.error("[JobTracker] ❌ Notion API error:", err);
+        }
+      } catch (err) {
+        console.error("[JobTracker] ❌ Network or fetch error:", err);
+      }
+    });
   });
 });
