@@ -146,5 +146,6 @@ Then push and open a **pull request**.
 * Ensure user completed full application and submitted, before adding the field into notion database
 * Ensure user applies to the same job only once (If the job application link is external, linkedIn does not show the applied status)
 * Easy apply jobs must only be recorded if full application was submitted successfuly (and not in draft)
+* Add job description field in notion database
 
 
