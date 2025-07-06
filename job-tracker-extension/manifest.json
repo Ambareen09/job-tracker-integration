@@ -8,7 +8,8 @@
   },
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
-    "https://job-tracker-integration.onrender.com/*"
+    "https://job-tracker-integration.onrender.com/*",
+    "http://localhost:5001/*"
   ],
   "content_scripts": [
     {
