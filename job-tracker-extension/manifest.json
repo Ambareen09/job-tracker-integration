@@ -6,7 +6,10 @@
   "icons": {
     "128": "icon.png"
   },
-  "permissions": ["storage", "activeTab", "scripting"],
+  "permissions": ["storage", "activeTab", "scripting", "notifications"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "host_permissions": [
     "https://job-tracker-integration.onrender.com/*",
     "http://localhost:5001/*"

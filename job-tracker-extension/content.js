@@ -1,13 +1,10 @@
-/** @format */
-
 console.log(
   "%c[JobTracker] 🎬 content.js injected",
   "color: purple; font-weight: bold;"
-);
-
-window.addEventListener("load", () => {
+);window.addEventListener("load", () => {
   console.log("[JobTracker] 📦 window.load fired");
 
+  
   function pick(selectors) {
     for (const sel of selectors) {
       const el = document.querySelector(sel);
@@ -26,9 +23,8 @@ window.addEventListener("load", () => {
 
     console.log("[JobTracker] 🖱️ Apply button clicked");
 
-    await new Promise((r) => setTimeout(r, 1500)); // Allow content to load
+    await new Promise((r) => setTimeout(r, 1500)); 
 
-    // --- Title ---
     const titleEl = pick([
       "h1.jobs-unified-top-card__job-title",
       "h1.top-card-layout__title",
@@ -42,7 +38,6 @@ window.addEventListener("load", () => {
       console.log("[JobTracker] 🪪 fallback title →", jobTitle);
     }
 
-    // --- Company ---
     const compEl = pick([
       "div.job-details-jobs-unified-top-card__company-name a",
       "div.job-details-jobs-unified-top-card__company-name",
@@ -74,7 +69,6 @@ window.addEventListener("load", () => {
       console.log("[JobTracker] 🪪 fallback company →", company);
     }
 
-    // --- Location ---
     const locEl = pick([
       "div.job-details-jobs-unified-top-card__tertiary-description-container span.tvm__text",
       "span.jobs-unified-top-card__bullet",
@@ -88,6 +82,18 @@ window.addEventListener("load", () => {
 
     const url = window.location.href;
     console.log("[JobTracker] 🔗 Job URL →", url);
+
+    function showNotification(title, message) {
+      chrome.runtime.sendMessage({
+        type: "SHOW_NOTIFICATION",
+        options: {
+          type: "basic",
+          iconUrl: "icon.png", // make sure this icon exists in your extension folder
+          title,
+          message
+        }
+      });
+    }
 
     chrome.storage.sync.get(
       ["notionKey", "databaseId"],
@@ -124,6 +130,8 @@ window.addEventListener("load", () => {
           if (res.status === 201) {
             console.log("[JobTracker] ✅ Job successfully logged to Notion");
           } else if (res.status === 409) {
+            chrome.runtime.sendMessage({ type: "duplicate-job" }); // This triggers the popup
+
             console.warn(
               "[JobTracker] ⚠️ Duplicate detected → Job already exists in Notion"
             );
@@ -139,4 +147,5 @@ window.addEventListener("load", () => {
       }
     );
   });
+
 });
