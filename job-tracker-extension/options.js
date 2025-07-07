@@ -1,71 +1,30 @@
-console.log("[JobTracker] Extension Loaded");
+/** @format */
 
-const applyButtonSelector = 'button.jobs-apply-button';
-let lastSubmittedUrl = "";
+document.addEventListener("DOMContentLoaded", () => {
+  const notionKeyInput = document.getElementById("notionKey");
+  const databaseIdInput = document.getElementById("databaseId");
+  const saveBtn = document.getElementById("saveBtn");
+  const successMsg = document.getElementById("success");
 
-function getJobDetails() {
-  const jobTitleElement = document.querySelector('h2.top-card-layout__title');
-  const companyElement = document.querySelector('.topcard__org-name-link, .topcard__flavor');
-  const locationElement = document.querySelector('.topcard__flavor--bullet');
+  chrome.storage.sync.get(["notionKey", "databaseId"], (data) => {
+    if (data.notionKey) notionKeyInput.value = data.notionKey;
+    if (data.databaseId) databaseIdInput.value = data.databaseId;
+  });
 
-  const jobTitle = jobTitleElement?.innerText.trim() || "Unknown Title";
-  const company = companyElement?.innerText.trim() || "Unknown Company";
-  const location = locationElement?.innerText.trim() || "";
-  const jobUrl = window.location.href;
+  saveBtn.addEventListener("click", () => {
+    const notionKey = notionKeyInput.value.trim();
+    const databaseId = databaseIdInput.value.trim();
 
-  return { jobTitle, company, location, jobUrl };
-}
-
-function sendToNotion(details) {
-  chrome.storage.sync.get(['notionKey', 'databaseId'], ({ notionKey, databaseId }) => {
     if (!notionKey || !databaseId) {
-      console.warn('[JobTracker] ❗ Notion key or database ID is missing.');
+      alert("Please fill in both Notion fields.");
       return;
     }
 
-    fetch('http://localhost:5001/add-to-notion', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...details,
-        notionKey,
-        databaseId
-      })
-    })
-    .then(res => res.json())
-    .then(response => {
-      if (response.status === 200) {
-        console.log(`[JobTracker] ✅ Successfully logged ➝ ${details.jobUrl}`);
-      } else if (response.status === 409) {
-        console.info(`[JobTracker] ⚠️ Duplicate entry skipped ➝ ${details.jobUrl}`);
-      } else {
-        console.error('[JobTracker] ❌ Error logging to Notion:', response.response);
-      }
-    })
-    .catch(error => {
-      console.error('[JobTracker] ❌ Fetch failed:', error);
+    chrome.storage.sync.set({ notionKey, databaseId }, () => {
+      successMsg.style.display = "block";
+      setTimeout(() => {
+        successMsg.style.display = "none";
+      }, 2000);
     });
   });
-}
-
-function handleClick() {
-  const details = getJobDetails();
-
-  if (details.jobUrl === lastSubmittedUrl) {
-    console.log('[JobTracker] 🔁 Already submitted this job URL. Skipping...');
-    return;
-  }
-
-  lastSubmittedUrl = details.jobUrl;
-  sendToNotion(details);
-}
-
-const observer = new MutationObserver(() => {
-  const applyButton = document.querySelector(applyButtonSelector);
-  if (applyButton && !applyButton.dataset.jobTrackerBound) {
-    applyButton.addEventListener('click', handleClick);
-    applyButton.dataset.jobTrackerBound = 'true';
-  }
 });
-
-observer.observe(document.body, { childList: true, subtree: true });
