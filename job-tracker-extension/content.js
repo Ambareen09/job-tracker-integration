@@ -1,62 +1,51 @@
-console.log(
-  "%c[JobTracker] 🎬 content.js injected",
-  "color: purple; font-weight: bold;"
-);
+console.log("%c[JobTracker] 🎬 content.js injected", "color: purple; font-weight: bold;");
 
 window.addEventListener("load", () => {
   console.log("[JobTracker] 📦 window.load fired");
 
-  function pick(selectors) {
-    for (const sel of selectors) {
-      const el = document.querySelector(sel);
-      if (el) return el;
-    }
-    return null;
-  }
+  const pick = (selectors) =>
+    selectors.map(sel => document.querySelector(sel)).find(Boolean) || null;
 
-  function extractJobData() {
-    const titleEl = pick([
-      "h1.jobs-unified-top-card__job-title",
-      "h1.top-card-layout__title",
-      "h1[data-test-job-detail-title]",
-      "h1"
-    ]);
-    const jobTitle = titleEl?.innerText.trim() || "";
+  const extractJobData = () => {
+    const jobTitle =
+      pick([
+        "h1.jobs-unified-top-card__job-title",
+        "h1.top-card-layout__title",
+        "h1[data-test-job-detail-title]",
+        "h1"
+      ])?.innerText.trim() || "";
 
-    const compEl = pick([
+    const companyEl = pick([
       "div.job-details-jobs-unified-top-card__company-name a",
       "div.job-details-jobs-unified-top-card__company-name",
       "a.topcard__org-name-link",
       "a[data-test-company-name]",
       ".jobs-unified-top-card__company-name"
     ]);
-    let company = "";
-    if (compEl) {
-      company = compEl.innerText.trim() || "";
-      if (!company) {
-        company =
-          compEl.getAttribute("aria-label")?.replace(/\s*logo$/i, "").trim() ||
-          compEl.querySelector("img")?.alt.replace(/\s*logo$/i, "").trim() ||
-          "";
-      }
+    let company = companyEl?.innerText.trim() || "";
+    if (!company) {
+      company =
+        companyEl?.getAttribute("aria-label")?.replace(/\s*logo$/i, "").trim() ||
+        companyEl?.querySelector("img")?.alt.replace(/\s*logo$/i, "").trim() ||
+        "";
     }
 
-    const locEl = pick([
-      "div.job-details-jobs-unified-top-card__tertiary-description-container span.tvm__text",
-      "span.jobs-unified-top-card__bullet",
-      ".jobs-unified-top-card__workplace-type"
-    ]);
-    const location = locEl?.innerText.trim() || "";
+    const location =
+      pick([
+        "div.job-details-jobs-unified-top-card__tertiary-description-container span.tvm__text",
+        "span.jobs-unified-top-card__bullet",
+        ".jobs-unified-top-card__workplace-type"
+      ])?.innerText.trim() || "";
 
     const url = window.location.href;
 
-    console.log("[JobTracker] 🧭 Location →", location);
-    console.log(`[JobTracker] 🏢 "${jobTitle}" @ "${company}"`);
+    console.log("[JobTracker] 🧭 Location:", location);
+    console.log(`[JobTracker] 🏢 ${jobTitle} @ ${company}`);
 
     return { jobTitle, company, location, url };
-  }
+  };
 
-  function showNotification(title, message) {
+  const showNotification = (title, message) => {
     chrome.runtime.sendMessage({
       type: "SHOW_NOTIFICATION",
       options: {
@@ -66,43 +55,36 @@ window.addEventListener("load", () => {
         message
       }
     });
-  }
+  };
 
-  async function logJobToNotion(remarks = "") {
+  const logJobToNotion = async (remarks = "") => {
     const { jobTitle, company, location, url } = extractJobData();
-
+  
     chrome.storage.sync.get(["notionKey", "databaseId"], async ({ notionKey, databaseId }) => {
       if (!notionKey || !databaseId) {
-        console.warn("[JobTracker] ❌ Missing Notion credentials");
+        console.warn("[JobTracker] ❌ Notion credentials missing");
         return;
       }
-
-      console.log("[JobTracker] 🔐 Sending job to Notion...");
-
+  
       const baseURL =
         window.location.hostname === "localhost"
           ? "http://localhost:5001"
           : "https://job-tracker-integration.onrender.com";
-
+  
       try {
         const res = await fetch(`${baseURL}/add-to-notion`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jobTitle,
-            company,
-            location,
-            url,
-            notionKey,
-            databaseId,
-            remarks
-          })
+          body: JSON.stringify({ jobTitle, company, location, url, notionKey, databaseId, remarks })
         });
-
+  
         const result = await res.json();
-
+  
         if (res.status === 201) {
-          console.log("[JobTracker] ✅ Job logged to Notion");
+          console.log(
+            `%c[JobTracker] ✅ Successfully saved "${jobTitle}" @ "${company}" to Notion`,
+            "color: green; font-weight: bold;"
+          );
         } else if (res.status === 409) {
           console.warn("[JobTracker] ⚠️ Duplicate job detected");
           showNotification("Job Tracker", "⚠️ You already applied for this job!");
@@ -113,44 +95,41 @@ window.addEventListener("load", () => {
         console.error("[JobTracker] ❌ Fetch error:", err);
       }
     });
-  }
+  };
 
-  function trackSubmitButton() {
+  const trackSubmitButton = () => {
     const observer = new MutationObserver(() => {
       const submitBtn = document.querySelector('button[aria-label*="Submit application"]');
       if (submitBtn && !submitBtn.dataset.tracked) {
         submitBtn.dataset.tracked = "true";
         submitBtn.addEventListener("click", () => {
-          console.log("[JobTracker] 📤 Submit Application clicked — Logging to Notion");
+          console.log("[JobTracker] 📤 Submit Application clicked");
           logJobToNotion();
         });
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
-  }
+  };
 
-  document.body.addEventListener("click", async (e) => {
+  document.body.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
 
     const text = btn.innerText || "";
     const aria = btn.getAttribute("aria-label") || "";
 
-    const isApplyClick = /Apply/i.test(text) || /Apply/i.test(aria);
-    if (!isApplyClick) return;
+    if (!/Apply/i.test(text) && !/Apply/i.test(aria)) return;
 
     const isEasyApply = /Easy Apply/i.test(text) || /Easy Apply/i.test(aria);
     const url = window.location.href;
-    console.log("[JobTracker] 🔗 Job URL →", url);
+    console.log("[JobTracker] 🔗 Job URL:", url);
 
     if (isEasyApply) {
-      console.log("%c[JobTracker] 🛠 Detected Easy Apply → Waiting for Submit Application", "color: orange;");
-      trackSubmitButton(); // wait for actual submit click
-      return;
+      console.log("%c[JobTracker] 🛠 Easy Apply → Waiting for Submit", "color: orange;");
+      trackSubmitButton();
+    } else {
+      console.log("[JobTracker] 🔗 External Apply → Logging now");
+      logJobToNotion("External link clicked");
     }
-
-    // External Apply
-    console.log("[JobTracker] 🔗 External Apply clicked — Logging now");
-    logJobToNotion("External link clicked");
   });
 });
