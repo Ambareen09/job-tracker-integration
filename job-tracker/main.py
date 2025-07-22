@@ -65,6 +65,7 @@ def add_to_notion():
             "Location": {"rich_text": [{"text": {"content": location}}]},
             "Date Applied": {"date": {"start": datetime.utcnow().isoformat()}},
             "Source": {"select": {"name": "LinkedIn"}},
+            "Status": {"select": {"name": "Applied"}},
             "URL": {"url": job_url}
         }
     }
