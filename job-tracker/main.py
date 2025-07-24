@@ -43,6 +43,7 @@ def add_to_notion():
     company = data.get("company", "Unknown").strip()
     location = data.get("location", "").strip()
     job_url = data.get("url", "").strip()
+    job_description = data.get("jobDescription", "").strip()
 
     if not notion_token or not database_id:
         return jsonify({"error": "Missing Notion credentials"}), 400
@@ -66,7 +67,8 @@ def add_to_notion():
             "Date Applied": {"date": {"start": datetime.utcnow().isoformat()}},
             "Source": {"select": {"name": "LinkedIn"}},
             "Status": {"status": {"name": "Applied"}},
-            "URL": {"url": job_url}
+            "URL": {"url": job_url},
+            "Job Description": {"rich_text": [{"text": {"content": job_description[:2000]}}]},
         }
     }
 
